@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
+import userModel from "../models/userModel.js";
 
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
@@ -190,6 +191,18 @@ const doctorDashboard = async (req, res) => {
     }
 }
 
+const PatientProfile = async (req, res) => {
+    const patientId = req.params.id;
+    try {
+      console.log(patientId)
+      console.log("hiiiiiiiiiiii")
+      const patient = await userModel.findById(patientId);  // Replace with actual data source
+      res.json(patient);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching patient data' });
+    }
+  }
+
 export {
     loginDoctor,
     appointmentsDoctor,
@@ -199,5 +212,6 @@ export {
     appointmentComplete,
     doctorDashboard,
     doctorProfile,
-    updateDoctorProfile
+    updateDoctorProfile,
+    PatientProfile
 }

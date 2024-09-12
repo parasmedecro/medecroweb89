@@ -14,6 +14,9 @@ import Login from './pages/Login';
 import DoctorAppointments from './pages/Doctor/DoctorAppointments';
 import DoctorDashboard from './pages/Doctor/DoctorDashboard';
 import DoctorProfile from './pages/Doctor/DoctorProfile';
+// App.js or where routes are defined
+// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import PatientProfile from './pages/Doctor/PatientProfile';  // Import the component
 
 const App = () => {
 
@@ -35,6 +38,7 @@ const App = () => {
           <Route path='/doctor-dashboard' element={<DoctorDashboard />} />
           <Route path='/doctor-appointments' element={<DoctorAppointments />} />
           <Route path='/doctor-profile' element={<DoctorProfile />} />
+          <Route path="/patient/:id" element={<PatientProfile />} />
         </Routes>
       </div>
     </div>

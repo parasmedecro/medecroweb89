@@ -7,8 +7,12 @@ import { assets } from '../assets/assets'
 
 const MyAppointments = () => {
 
+    const UPIID = import.meta.env.VITE_UPI;
+
     const { backendUrl, token } = useContext(AppContext)
     const navigate = useNavigate()
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [upiAmount, setUpiAmount] = useState(''); // Store the amount for the QR
 
     const [appointments, setAppointments] = useState([])
     const [payment, setPayment] = useState('')
@@ -90,7 +94,7 @@ const MyAppointments = () => {
             const { data } = await axios.post(backendUrl + '/api/user/payment-razorpay', { appointmentId }, { headers: { token } })
             if (data.success) {
                 initPay(data.order)
-            }else{
+            } else {
                 toast.error(data.message)
             }
         } catch (error) {
@@ -100,20 +104,16 @@ const MyAppointments = () => {
     }
 
     // Function to make payment using stripe
-    const appointmentStripe = async (appointmentId) => {
+    const appointmentUPI = async (Fees) => {
         try {
-            const { data } = await axios.post(backendUrl + '/api/user/payment-stripe', { appointmentId }, { headers: { token } })
-            if (data.success) {
-                const { session_url } = data
-                window.location.replace(session_url)
-            }else{
-                toast.error(data.message)
-            }
+            setUpiAmount(Fees);
+            setShowQRModal(true); // Show the QR modal when UPI is clicked
         } catch (error) {
-            console.log(error)
-            toast.error(error.message)
+            console.log(error);
+            toast.error(error.message);
         }
-    }
+    };
+
 
 
 
@@ -130,7 +130,12 @@ const MyAppointments = () => {
                 {appointments.map((item, index) => (
                     <div key={index} className='grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-4 border-b'>
                         <div>
-                            <img className='w-36 bg-[#EAEFFF]' src={item.docData.image} alt="" />
+                        <img 
+    className="w-48 h-48 object-cover rounded-md bg-[#EAEFFF]" 
+    src={item.docData.image} 
+    alt="Doctor Image" 
+/>
+
                         </div>
                         <div className='flex-1 text-sm text-[#5E5E5E]'>
                             <p className='text-[#262626] text-base font-semibold'>{item.docData.name}</p>
@@ -143,7 +148,12 @@ const MyAppointments = () => {
                         <div></div>
                         <div className='flex flex-col gap-2 justify-end text-sm text-center'>
                             {!item.cancelled && !item.payment && !item.isCompleted && payment !== item._id && <button onClick={() => setPayment(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300'>Pay Online</button>}
-                            {!item.cancelled && !item.payment && !item.isCompleted && payment === item._id && <button onClick={() => appointmentStripe(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-gray-100 hover:text-white transition-all duration-300 flex items-center justify-center'><img className='max-w-20 max-h-5' src={assets.stripe_logo} alt="" /></button>}
+                            {!item.cancelled && !item.payment && !item.isCompleted && payment === item._id && (
+                                <button onClick={() => appointmentUPI(item.amount)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-gray-100 hover:text-black transition-all duration-300 flex items-center justify-center'>
+                                    <span className='max-w-20 max-h-5'>UPI QR</span>
+                                </button>
+                            )}
+
                             {!item.cancelled && !item.payment && !item.isCompleted && payment === item._id && <button onClick={() => appointmentRazorpay(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-gray-100 hover:text-white transition-all duration-300 flex items-center justify-center'><img className='max-w-20 max-h-5' src={assets.razorpay_logo} alt="" /></button>}
                             {!item.cancelled && item.payment && !item.isCompleted && <button className='sm:min-w-48 py-2 border rounded text-[#696969]  bg-[#EAEFFF]'>Paid</button>}
 
@@ -152,6 +162,30 @@ const MyAppointments = () => {
                             {!item.cancelled && !item.isCompleted && <button onClick={() => cancelAppointment(item._id)} className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300'>Cancel appointment</button>}
                             {item.cancelled && !item.isCompleted && <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500'>Appointment cancelled</button>}
                         </div>
+                        {showQRModal && (
+                            <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
+                                <div className="bg-white rounded-xl p-8 relative w-96 shadow-2xl transition-all duration-300">
+                                    <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Scan UPI QR Code</h2>
+                                    <div className="flex justify-center mb-6">
+                                        {/* Replace with your actual QR code generation */}
+                                        <img
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${UPIID}&pn=MEDPLUS&am=${upiAmount}&cu=INR`)}`}
+                                            alt="UPI QR Code"
+                                            className="w-48 h-48 rounded-md shadow-md"
+                                        />
+                                    </div>
+                                    <p className="text-center text-lg font-medium text-gray-700 mb-4">Amount: ₹{upiAmount}</p>
+                                    <div className="flex justify-center">
+                                        <button
+                                            onClick={() => setShowQRModal(false)}
+                                            className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-md"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
