@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
 import userModel from "../models/userModel.js";
+import { v2 as cloudinary } from 'cloudinary'
 
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
@@ -102,6 +103,19 @@ const doctorList = async (req, res) => {
     }
 
 }
+// API to get all patients list for Frontend
+const patientList = async (req, res) => {
+    try {
+
+        const patients = await userModel.find({}).select(['-password', '-email'])
+        res.json({ success: true, patients })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+
+}
 
 // API to change doctor availablity for Admin and Doctor Panel
 const changeAvailablity = async (req, res) => {
@@ -191,11 +205,48 @@ const doctorDashboard = async (req, res) => {
     }
 }
 
+// API to get user profile data
+const getProfile = async (req, res) => {
+
+    try {
+        const { userId } = req.body
+        const userData = await userModel.findById(userId).select('-password')
+
+        res.json({ success: true, userData })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to update user profile
+const updateProfile = async (req, res) => {
+    try {
+        const { userId, name, phone, address, dob, gender } = req.body
+        console.log("hi")
+        const imageFile = req.file
+
+        if (!name || !phone || !dob || !gender) {
+            return res.json({ success: false, message: "Data Missing" })
+        }
+        await userModel.findByIdAndUpdate(userId, { name, phone, address: JSON.parse(address), dob, gender })
+        if (imageFile) {
+            // upload image to cloudinary
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" })
+            const imageURL = imageUpload.secure_url
+            await userModel.findByIdAndUpdate(userId, { image: imageURL })
+        }
+        res.json({ success: true, message: 'Profile Updated' })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
 const PatientProfile = async (req, res) => {
     const patientId = req.params.id;
     try {
-      console.log(patientId)
-      console.log("hiiiiiiiiiiii")
       const patient = await userModel.findById(patientId);  // Replace with actual data source
       res.json(patient);
     } catch (error) {
@@ -213,5 +264,8 @@ export {
     doctorDashboard,
     doctorProfile,
     updateDoctorProfile,
-    PatientProfile
+    PatientProfile,
+    getProfile,
+    updateProfile,
+    patientList
 }
