@@ -10,10 +10,10 @@ import userModel from "../models/userModel.js";
 const loginAdmin = async (req, res) => {
     try {
 
-        const { email, password } = req.body
+        const { number, password } = req.body
 
-        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign(email + password, process.env.JWT_SECRET)
+        if (number === process.env.ADMIN_NUMBER && password === process.env.ADMIN_PASSWORD) {
+            const token = jwt.sign(number + password, process.env.JWT_SECRET)
             res.json({ success: true, token })
         } else {
             res.json({ success: false, message: "Invalid credentials" })
@@ -62,17 +62,22 @@ const addDoctor = async (req, res) => {
 
     try {
 
-        const { name, email, password, speciality, degree, experience, about, fees, address } = req.body
+        const { name, email,number, password, speciality, degree, experience, about, fees, address } = req.body
         const imageFile = req.file
 
         // checking for all data to add doctor
-        if (!name || !email || !password || !speciality || !degree || !experience || !about || !fees || !address) {
+        if (!name || !email || !number || !password || !speciality || !degree || !experience || !about || !fees || !address) {
             return res.json({ success: false, message: "Missing Details" })
         }
 
         // validating email format
         if (!validator.isEmail(email)) {
             return res.json({ success: false, message: "Please enter a valid email" })
+        }
+
+        // validating number format 
+        if (!validator.isMobilePhone(number, 'any')) { 
+            return res.json({ success: false, message: "Please enter a valid mobile number" });
         }
 
         // validating strong password
@@ -91,6 +96,7 @@ const addDoctor = async (req, res) => {
         const doctorData = {
             name,
             email,
+            number,
             image: imageUrl,
             password: hashedPassword,
             speciality,

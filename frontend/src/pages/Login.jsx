@@ -9,7 +9,7 @@ const Login = () => {
   const [state, setState] = useState('Sign Up')
 
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [number, setNumber] = useState('')
   const [password, setPassword] = useState('')
 
   const navigate = useNavigate()
@@ -20,7 +20,7 @@ const Login = () => {
 
     if (state === 'Sign Up') {
 
-      const { data } = await axios.post(backendUrl + '/api/user/register', { name, email, password })
+      const { data } = await axios.post(backendUrl + '/api/user/register', { name, number, password })
 
       if (data.success) {
         localStorage.setItem('token', data.token)
@@ -31,7 +31,7 @@ const Login = () => {
 
     } else {
 
-      const { data } = await axios.post(backendUrl + '/api/user/login', { email, password })
+      const { data } = await axios.post(backendUrl + '/api/user/login', { number, password })
 
       if (data.success) {
         localStorage.setItem('token', data.token)
@@ -63,8 +63,8 @@ const Login = () => {
           : null
         }
         <div className='w-full '>
-          <p>Email</p>
-          <input onChange={(e) => setEmail(e.target.value)} value={email} className='border border-[#DADADA] rounded w-full p-2 mt-1' type="email" required />
+          <p>Mobile No.</p>
+          <input onChange={(e) => setNumber(e.target.value)} value={number} className='border border-[#DADADA] rounded w-full p-2 mt-1' type="tel" pattern='[0-9]{10}' required />
         </div>
         <div className='w-full '>
           <p>Password</p>

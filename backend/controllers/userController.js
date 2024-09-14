@@ -18,15 +18,15 @@ const razorpayInstance = new razorpay({
 // API to register user
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, number, password } = req.body;
 
     // checking for all data to register user
-    if (!name || !email || !password) {
+    if (!name || !number || !password) {
       return res.json({ success: false, message: "Missing Details" });
     }
 
     // validating email format
-    if (!validator.isEmail(email)) {
+    if (!validator.isMobilePhone(number)) {
       return res.json({
         success: false,
         message: "Please enter a valid email",
@@ -47,7 +47,7 @@ const registerUser = async (req, res) => {
 
     const userData = {
       name,
-      email,
+      phone:number,
       password: hashedPassword,
     };
 
@@ -65,8 +65,9 @@ const registerUser = async (req, res) => {
 // API to login user
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await userModel.findOne({ email });
+    const { number, password } = req.body;
+    const user = await userModel.findOne({ phone: number });
+    
 
     if (!user) {
       return res.json({ success: false, message: "User does not exist" });

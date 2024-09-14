@@ -10,6 +10,7 @@ const AddDoctor = () => {
     const [docImg, setDocImg] = useState(false)
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
+    const [number, setNumber] = useState('')
     const [password, setPassword] = useState('')
     const [experience, setExperience] = useState('1 Year')
     const [fees, setFees] = useState('')
@@ -36,6 +37,7 @@ const AddDoctor = () => {
             formData.append('image', docImg)
             formData.append('name', name)
             formData.append('email', email)
+            formData.append('number', number)
             formData.append('password', password)
             formData.append('experience', experience)
             formData.append('fees', Number(fees))
@@ -56,6 +58,7 @@ const AddDoctor = () => {
                 setName('')
                 setPassword('')
                 setEmail('')
+                setNumber('')
                 setAddress1('')
                 setAddress2('')
                 setDegree('')
@@ -93,6 +96,10 @@ const AddDoctor = () => {
                         <div className='flex-1 flex flex-col gap-1'>
                             <p>Your name</p>
                             <input onChange={e => setName(e.target.value)} value={name} className='border rounded px-3 py-2' type="text" placeholder='Name' required />
+                        </div>
+                        <div className='flex-1 flex flex-col gap-1'>
+                            <p>Phone Number</p>
+                            <input onChange={e => setNumber(e.target.value)} value={number} className='border rounded px-3 py-2' type="text" placeholder='0123456789' required />
                         </div>
 
                         <div className='flex-1 flex flex-col gap-1'>
