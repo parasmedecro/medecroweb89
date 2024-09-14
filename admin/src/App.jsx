@@ -18,6 +18,7 @@ import PatientList from './pages/Doctor/PatientList';
 // App.js or where routes are defined
 // import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PatientProfile from './pages/Doctor/PatientProfile';  // Import the component
+import PatientPrescription from './pages/Doctor/PatientPrescription';
 
 const App = () => {
 
@@ -41,6 +42,7 @@ const App = () => {
           <Route path='/doctor-profile' element={<DoctorProfile />} />
           <Route path="/patient/:id" element={<PatientProfile />} />
           <Route path="/patients" element={<PatientList />} />
+          <Route path="/prescription/:id" element={<PatientPrescription />} />
         </Routes>
       </div>
     </div>

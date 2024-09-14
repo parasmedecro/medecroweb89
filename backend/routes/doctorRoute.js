@@ -1,5 +1,5 @@
 import express from 'express';
-import { loginDoctor, appointmentsDoctor, appointmentCancel, doctorList, changeAvailablity, appointmentComplete, doctorDashboard, doctorProfile, updateDoctorProfile,PatientProfile,patientList,getProfile,updateProfile } from '../controllers/doctorController.js';
+import { loginDoctor, appointmentsDoctor, appointmentCancel, doctorList, changeAvailablity, appointmentComplete, doctorDashboard, doctorProfile, updateDoctorProfile,PatientProfile,patientList,getProfile,updateProfile,savePrescription,savePrescriptions,getSavedPrescriptions } from '../controllers/doctorController.js';
 import authDoctor from '../middleware/authDoctor.js';
 import upload from '../middleware/multer.js';
 const doctorRouter = express.Router();
@@ -17,6 +17,8 @@ doctorRouter.get("/profile", authDoctor, doctorProfile)
 doctorRouter.post("/update-profile", authDoctor, updateDoctorProfile)
 doctorRouter.get("/patient/:id", authDoctor, PatientProfile)
 doctorRouter.get("/patients", authDoctor, patientList)
+doctorRouter.post("/prescriptions", authDoctor, savePrescription)
+doctorRouter.get("/prescriptions", authDoctor, savePrescriptions)
 
 
 
