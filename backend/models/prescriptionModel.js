@@ -3,19 +3,19 @@ import mongoose from "mongoose";
 // Define the schema for a prescription
 const prescriptionSchema = new mongoose.Schema({
   // Patient information
-  patientId: { type: String, required: true },      // Patient ID
-  patientName: { type: String, required: true },    // Patient name
-  patientAge: { type: String, required: true },     // Patient age
+  patientId: { type: String},      // Patient ID
+  patientName: { type: String  },    // Patient name
+  patientAge: { type: String  },     // Patient age
 
   // Doctor information
-  doctorId: { type: String, required: true },       // Doctor ID
-  doctorName: { type: String, required: true },     // Doctor name
-  doctorSpecialty: { type: String, required: true },// Doctor specialty
+  doctorId: { type: String  },       // Doctor ID
+  doctorName: { type: String  },     // Doctor name
+  doctorSpecialty: { type: String  },// Doctor specialty
 
-  // Prescription details (No nested schema)
-  prescriptions: {
-    type: { type: String, required: true },         // e.g., Tablet, Drop, Cream, Oil
-    medicine: { type: String, required: true },     // e.g., Paracetamol
+  // Prescription details (Array of prescription objects)
+  prescriptionDetails: [{
+    type: { type: String  },         // e.g., Tablet, Drop, Cream, Oil
+    medicine: { type: String  },     // e.g., Paracetamol
     slot: {
       morning: { type: Boolean, default: false },
       afternoon: { type: Boolean, default: false },
@@ -25,9 +25,9 @@ const prescriptionSchema = new mongoose.Schema({
       before: { type: Boolean, default: false },
       after: { type: Boolean, default: false }
     },
-    dose: { type: String, required: true },         // e.g., 1/2, 1
-    days: { type: String, required: true }          // e.g., 7 days
-  },
+    dose: { type: String  },         // e.g., 1/2, 1
+    days: { type: String  }          // e.g., 7 days
+  }],
 
   // Advice and investigations
   advice: { type: [String], default: [] },          // Array of advice strings

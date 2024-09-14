@@ -240,48 +240,66 @@ const PatientProfile = async (req, res) => {
 };
 
 const savePrescription = async (req, res) => {
-    console.log("here")
-  try {
-    const { patientId, patientName, patientAge, doctorId, doctorName, doctorSpecialty, prescriptions, advice, investigations } = req.body;
+    console.log("here");
+  
+    try {
+      const { patientId, patientName, patientAge, doctorId, doctorName, doctorSpecialty, prescriptions, advice, investigations } = req.body;
+  
+      // Ensure prescriptions is an array and not empty
+      if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
+        return res.status(400).json({ message: "Prescriptions array is required and cannot be empty" });
+      }
+  
+      const filteredPrescriptions = prescriptions.map(prescription => ({
+        type: prescription.type,
+        medicine: prescription.medicine,
+        slot: prescription.slot,
+        beforeAfter: prescription.beforeAfter,
+        dose: prescription.dose,
+        days: prescription.days
+      }));
 
-    const newPrescription = new Prescription({
+      const newPrescription = new Prescription({
         patientId,
         patientName,
         patientAge,
         doctorId,
         doctorName,
         doctorSpecialty,
-        prescriptionDetails: {
-          type: prescriptions[0].type,
-          medicine: prescriptions[0].medicine,
-          slot: prescriptions[0].slot,
-          beforeAfter: prescriptions[0].beforeAfter,
-          dose: prescriptions[0].dose,
-          days: prescriptions[0].days
-        },
-        advice,  // Convert single string to array if provided
-        investigations  // Convert single string to array if provided
+        prescriptionDetails: filteredPrescriptions,  // Save the filtered array of prescriptions
+        advice: advice || [],  // Use provided advice or an empty array
+        investigations: investigations || []  // Use provided investigations or an empty array
       });
-      console.log(newPrescription)
+  
+      await newPrescription.save();
+  
+      res.status(201).json({ message: "Prescription saved successfully" });
+    } catch (error) {
+      console.error('Error saving prescriptions:', error);
+      res.status(500).json({ message: "Failed to save prescriptions", error: error.message });
+    }
+  };
 
-    await newPrescription.save();
-    res.status(201).json({ message: "Prescription saved successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to save prescription", error });
-  }
-};
-const savePrescriptions = async (req, res) => {
-    res.send("hi")
-};
 
-const getSavedPrescriptions = async (req, res) => {
-  try {
-    const prescriptions = await Prescription.find({ user: req.user._id });
-    res.status(200).json(prescriptions);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch prescriptions", error });
-  }
-};
+  const getSavedPrescriptions = async (req, res) => {
+    const patientId = req.params.id; // Extract patientId from the request parameters
+  
+    try {
+      // Fetch all prescriptions for the specific patient using the patientId
+      const prescriptions = await Prescription.find({ patientId });
+  
+      // If no prescriptions are found, return a 404 response
+      if (!prescriptions || prescriptions.length === 0) {
+        return res.status(404).json({ message: "No prescriptions found for this patient" });
+      }
+  
+      // Send back the prescriptions in JSON format
+      res.json(prescriptions);
+    } catch (error) {
+      // Handle any errors that occur during fetching
+      res.status(500).json({ message: "Error fetching prescriptions", error: error.message });
+    }
+  };
 
 export {
   loginDoctor,
@@ -298,6 +316,5 @@ export {
   updateProfile,
   patientList,
   savePrescription,
-  savePrescriptions,
   getSavedPrescriptions,
 };

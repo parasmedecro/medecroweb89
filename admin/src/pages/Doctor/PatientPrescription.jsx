@@ -3,6 +3,7 @@ import { DoctorContext } from '../../context/DoctorContext';
 import { AppContext } from '../../context/AppContext';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Prescription = () => {
   const { id } = useParams();
@@ -38,6 +39,33 @@ const Prescription = () => {
   useEffect(() => {
     setid1(id);
   }, [id]);
+
+  const [getprescriptionsdb, setgetPrescriptionsdb] = useState([]);
+  const [loading, setLoading] = useState(true);  // For loading state
+  const [error, setError] = useState(null);      // For error handling
+
+  useEffect(() => {
+    const fetchPrescriptions = async () => {
+      setLoading(true);  // Set loading to true before starting the fetch
+      setError(null);    // Clear any previous errors
+
+      try {
+        const response = await axios.get(`${backendUrl}/api/doctor/prescriptions/${id}`, { headers: { dToken } }); // Replace with your endpoint
+        console.log("here is get - "+ response.data)
+        setgetPrescriptionsdb(response.data); // Set fetched data to state
+      } catch (err) {
+        // Catch errors and set the error message
+        setError(err.response ? err.response.data.message : 'Error fetching data');
+      } finally {
+        // Ensure loading is set to false regardless of success or failure
+        setLoading(false);
+      }
+    };
+
+    fetchPrescriptions();
+    console.log(getprescriptionsdb)
+  }, []);  // Empty dependency array means it runs only on component mount
+
 
   useEffect(() => {
     if (dToken) {
@@ -161,7 +189,6 @@ const Prescription = () => {
   };
 
   const saveAllData = async () => {
-    console.log(prescriptions)
     try {
       await axios.post(
         `${backendUrl}/api/doctor/prescriptions`,
@@ -180,7 +207,7 @@ const Prescription = () => {
           headers: { dToken },
         }
       );
-      alert('Prescription saved successfully');
+      toast.success('Prescription saved successfully');
 
       // Clear all data after saving
       setPrescriptions([]);
@@ -188,20 +215,21 @@ const Prescription = () => {
       setInvestigations([]);
     } catch (error) {
       console.error('Error saving prescription:', error);
-      alert('Failed to save prescription');
+      toast.error('Failed to save prescription');
     }
   };
 
   return (
+    <>
     <div className="flex flex-col w-full max-w-7xl mx-auto p-6 font-sans">
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="flex flex-col">
           <label className="text-gray-700 font-medium">ID:</label>
-          <input type="text" value={id1} className="border border-gray-300 rounded p-2" readOnly />
+          <input type="text" value={id1} className="border border-gray-300 rounded p-2"  />
         </div>
         <div className="flex flex-col">
           <label className="text-gray-700 font-medium">Name:</label>
-          <input type="text" value={userData.name} className="border border-gray-300 rounded p-2" readOnly />
+          <input type="text" value={userData.name} className="border border-gray-300 rounded p-2"  />
         </div>
         <div className="flex flex-col">
           <label className="text-gray-700 font-medium">Age:</label>
@@ -499,6 +527,72 @@ const Prescription = () => {
         </div>
       </div>
     </div>
+    
+    {/* BELOW CODE SEE TO MODIFY */}
+
+    <div className="container mx-auto p-4">
+  {loading ? (
+    <p className="text-center text-gray-500">Loading...</p>  // If loading is true, display loading message
+  ) : error ? (
+    <p className="text-center text-red-500">Error: {error}</p>  // If error exists, display error message
+  ) : !Array.isArray(getprescriptionsdb) || getprescriptionsdb.length === 0 ? (
+    <p className="text-center text-gray-500">No prescriptions available</p>  // If getprescriptionsdb is not an array or it's empty
+  ) : (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {getprescriptionsdb.map((prescription) => (
+        <div key={prescription._id} className="bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-2">Patient: {prescription.patientName}</h2>
+          <p className="text-sm text-gray-700">Age: {prescription.patientAge}</p>
+          <p className="text-sm text-gray-700">Doctor: {prescription.doctorName} ({prescription.doctorSpecialty})</p>
+
+          <h3 className="text-lg font-semibold mt-4">Details:</h3>
+          <ul className="list-disc pl-5">
+            {prescription.prescriptionDetails?.map((detail, index) => (
+              <li key={index} className="mt-2">
+                <p><span className="font-semibold">Type:</span> {detail.type}</p>
+                <p><span className="font-semibold">Medicine:</span> {detail.medicine}</p>
+                <p>
+                  <span className="font-semibold">Slot:</span> 
+                  {detail.slot?.morning ? ' Morning ' : ''}
+                  {detail.slot?.afternoon ? ' Afternoon ' : ''}
+                  {detail.slot?.night ? ' Night' : ''}
+                </p>
+                <p>
+                  <span className="font-semibold">Before/After:</span> 
+                  {detail.beforeAfter?.before ? ' Before ' : ''}
+                  {detail.beforeAfter?.after ? ' After' : ''}
+                </p>
+                <p><span className="font-semibold">Dose:</span> {detail.dose}</p>
+                <p><span className="font-semibold">Days:</span> {detail.days}</p>
+              </li>
+            ))}
+          </ul>
+
+          <h3 className="text-lg font-semibold mt-4">Advice:</h3>
+          {prescription.advice.length > 0 ? (
+            <ul className="list-disc pl-5">
+              {prescription.advice.map((item, index) => (
+                <li key={index} className="text-gray-700">{item}</li>
+              ))}
+            </ul>
+          ) : <p className="text-sm text-gray-500">No advice</p>}
+
+          <h3 className="text-lg font-semibold mt-4">Investigations:</h3>
+          {prescription.investigations.length > 0 ? (
+            <ul className="list-disc pl-5">
+              {prescription.investigations.map((item, index) => (
+                <li key={index} className="text-gray-700">{item}</li>
+              ))}
+            </ul>
+          ) : <p className="text-sm text-gray-500">No investigations</p>}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+
+    </>
   );
 };
 
