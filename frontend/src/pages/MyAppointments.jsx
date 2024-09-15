@@ -8,7 +8,7 @@ import { assets } from '../assets/assets'
 const MyAppointments = () => {
 
     const UPIID = import.meta.env.VITE_UPI;
-    const { backendUrl, token } = useContext(AppContext)
+    const { backendUrl, token ,userData} = useContext(AppContext)
     const navigate = useNavigate()
     const [showQRModal, setShowQRModal] = useState(false);
     const [upiAmount, setUpiAmount] = useState(''); // Store the amount for the QR
@@ -86,7 +86,7 @@ const MyAppointments = () => {
       };
       
 
-    const ReAppointment = async (userId) => {
+    const ReAppointment = async (userId,docname) => {
         try {
             const newslotDateFormatted = formatDate(newSlotDate);
             const formattedTime = formatTime("16:00");
@@ -103,6 +103,13 @@ const MyAppointments = () => {
             // setShowRescheduleModal(false)
             if (data.success) {
                 toast.success(data.message);
+                let msg = 'rescheduled'
+                let slotTime=formattedTime
+                let slotDate = newslotDateFormatted
+                let username = userData.name
+                let chatid = userData.chatid
+
+                await axios.post(backendUrl+'/api/telegram/sendtelappointmentmsg',{slotTime,slotDate,docname,username,chatid,msg})
                 getUserAppointments();
             } else {
                 toast.error(data.message);
@@ -236,7 +243,6 @@ const MyAppointments = () => {
                                         setShowRescheduleModal(true); // Show the reschedule modal
                                         
                                         setuserid(String(item.userId));
-                                        console.log("USER ID AFTER"+userid)
 
                                     }}
                                     className='text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300'>
@@ -304,7 +310,7 @@ const MyAppointments = () => {
 
                                     <div className="flex justify-center">
                                         <button
-                                            onClick={() => ReAppointment(userid)}
+                                            onClick={() => ReAppointment(userid,item.docData.name)}
                                             className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-md"
                                         >
                                             Confirm Reschedule

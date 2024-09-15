@@ -14,6 +14,8 @@ const prescriptionSchema = new mongoose.Schema({
 
   // Prescription details (Array of prescription objects)
   prescriptionDetails: [{
+    
+    symptoms: { type: String  },         // e.g., Tablet, Drop, Cream, Oil
     type: { type: String  },         // e.g., Tablet, Drop, Cream, Oil
     medicine: { type: String  },     // e.g., Paracetamol
     slot: {

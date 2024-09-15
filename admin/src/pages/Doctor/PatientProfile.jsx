@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { DoctorContext } from "../../context/DoctorContext";
-import { useParams, useNavigate  } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AppContext } from "../../context/AppContext";
 import { toast } from "react-toastify";
@@ -20,9 +20,13 @@ const PatientProfile = () => {
   const handleAddPrescription = () => {
     const urlParts = id
 
-    // Redirect to the new URL
     navigate(`/prescription/${urlParts}`);
-};
+  };
+  const handleAddReport = () => {
+    const urlParts = id
+    // Redirect to the new URL
+    navigate(`/report/${urlParts}`);
+  };
 
   const updateUserProfileData = async () => {
     try {
@@ -41,7 +45,7 @@ const PatientProfile = () => {
         formData,
         { headers: { dToken } }
       );
-   
+
       if (data.success) {
         toast.success(data.message);
         await loadUserProfileData();
@@ -259,20 +263,26 @@ const PatientProfile = () => {
           </button>
         ) : (
           <div className=" mb-4 flex justify-between">
-          <button
-            onClick={() => setIsEdit(true)}
-            className="border border-primary text-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all"
-          >
-            Edit
-          </button>
-        
-          <button
-            onClick={handleAddPrescription}
-            className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary-dark transition-all"
-          >
-            Add Prescription
-          </button>
-        </div>
+            <button
+              onClick={() => setIsEdit(true)}
+              className="border border-primary text-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all"
+            >
+              Edit
+            </button>
+
+            <button
+              onClick={handleAddPrescription}
+              className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary-dark transition-all"
+            >
+              Add Prescription
+            </button>
+            <button
+              onClick={handleAddReport}
+              className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary-dark transition-all"
+            >
+              Analyze Report
+            </button>
+          </div>
         )}
       </div>
     </div>

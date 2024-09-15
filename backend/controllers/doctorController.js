@@ -249,8 +249,10 @@ const savePrescription = async (req, res) => {
       if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
         return res.status(400).json({ message: "Prescriptions array is required and cannot be empty" });
       }
+      // console.log(symptoms)
   
       const filteredPrescriptions = prescriptions.map(prescription => ({
+        symptoms:prescription.symptoms,
         type: prescription.type,
         medicine: prescription.medicine,
         slot: prescription.slot,
@@ -300,6 +302,25 @@ const savePrescription = async (req, res) => {
       res.status(500).json({ message: "Error fetching prescriptions", error: error.message });
     }
   };
+  const analysisreport = async (req, res) => {
+    const patientId = req.params.id; // Extract patientId from the request parameters
+  
+    try {
+      // Fetch all prescriptions for the specific patient using the patientId
+      const prescriptions = await Prescription.find({ patientId });
+  
+      // If no prescriptions are found, return a 404 response
+      if (!prescriptions || prescriptions.length === 0) {
+        return res.status(404).json({ message: "No prescriptions found for this patient" });
+      }
+  
+      // Send back the prescriptions in JSON format
+      res.json(prescriptions);
+    } catch (error) {
+      // Handle any errors that occur during fetching
+      res.status(500).json({ message: "Error fetching prescriptions", error: error.message });
+    }
+  };
 
 export {
   loginDoctor,
@@ -317,4 +338,5 @@ export {
   patientList,
   savePrescription,
   getSavedPrescriptions,
+  analysisreport
 };

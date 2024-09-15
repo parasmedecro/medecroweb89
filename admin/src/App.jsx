@@ -19,11 +19,27 @@ import PatientList from './pages/Doctor/PatientList';
 // import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PatientProfile from './pages/Doctor/PatientProfile';  // Import the component
 import PatientPrescription from './pages/Doctor/PatientPrescription';
+import Report from './pages/Doctor/PatientReport';
 
 const App = () => {
 
   const { dToken } = useContext(DoctorContext)
   const { aToken } = useContext(AdminContext)
+
+  const sampleProps = {
+    males: 120,
+    females: 100,
+    diseases: ['Flu', 'Cold', 'COVID-19', 'Allergy'],
+    patientCounts: [50, 40, 60, 30],
+    bloodGroups: ['A+', 'B+', 'O+', 'AB+', 'A-', 'B-', 'O-', 'AB-'],
+    bloodGroupCounts: [30, 20, 25, 10, 5, 8, 3, 2],
+    ageGroups: ['0-18', '19-35', '36-50', '51-65', '65+'],
+    ageGroupCounts: [50, 80, 90, 60, 40],
+    adverseDrugs: ['Drug A', 'Drug B', 'Drug C', 'Drug D'],
+    drugCounts: [10, 20, 30, 15],
+    dailyAppointments: [20, 30, 25, 35, 40, 30, 20],
+    appointmentsCounts: [5, 7, 10, 12, 8, 5, 3]
+  };
 
   return dToken || aToken ? (
     <div className='bg-[#F8F9FD]'>
@@ -37,12 +53,13 @@ const App = () => {
           <Route path='/all-appointments' element={<AllAppointments />} />
           <Route path='/add-doctor' element={<AddDoctor />} />
           <Route path='/doctor-list' element={<DoctorsList />} />
-          <Route path='/doctor-dashboard' element={<DoctorDashboard />} />
+          <Route path='/doctor-dashboard' element={<DoctorDashboard {...sampleProps} />} />
           <Route path='/doctor-appointments' element={<DoctorAppointments />} />
           <Route path='/doctor-profile' element={<DoctorProfile />} />
           <Route path="/patient/:id" element={<PatientProfile />} />
           <Route path="/patients" element={<PatientList />} />
           <Route path="/prescription/:id" element={<PatientPrescription />} />
+          <Route path="/report/:id" element={<Report />} />
         </Routes>
       </div>
     </div>
@@ -55,3 +72,4 @@ const App = () => {
 }
 
 export default App
+

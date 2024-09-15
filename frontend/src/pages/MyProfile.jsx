@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
@@ -7,24 +7,29 @@ import { assets } from '../assets/assets'
 const MyProfile = () => {
 
     const [isEdit, setIsEdit] = useState(false)
-
-    const [image, setImage] = useState(false)
+    const [image, setImage] = useState(null)
+    const [showTelegramButton, setShowTelegramButton] = useState(true)
 
     const { token, backendUrl, userData, setUserData, loadUserProfileData } = useContext(AppContext)
 
+    useEffect(() => {
+        // Check if chatId exists and set button visibility accordingly
+        if (userData && userData.chatid) {
+            setShowTelegramButton(false)
+        } else {
+            setShowTelegramButton(true)
+        }
+    }, [userData])
+
     // Function to update user profile data using API
     const updateUserProfileData = async () => {
-
         try {
-
             const formData = new FormData();
-
             formData.append('name', userData.name)
             formData.append('phone', userData.phone)
             formData.append('address', JSON.stringify(userData.address))
             formData.append('gender', userData.gender)
             formData.append('dob', userData.dob)
-
             image && formData.append('image', image)
 
             const { data } = await axios.post(backendUrl + '/api/user/update-profile', formData, { headers: { token } })
@@ -33,7 +38,7 @@ const MyProfile = () => {
                 toast.success(data.message)
                 await loadUserProfileData()
                 setIsEdit(false)
-                setImage(false)
+                setImage(null)
             } else {
                 toast.error(data.message)
             }
@@ -42,8 +47,10 @@ const MyProfile = () => {
             console.log(error)
             toast.error(error.message)
         }
-
     }
+
+    // Create the URL to send a message to Telegram bot
+    const telegramUrl = `https://t.me/QuickMed_bot?start=${userData._id}`;
 
     return userData ? (
         <div className='max-w-lg flex flex-col gap-2 text-sm pt-5'>
@@ -119,6 +126,13 @@ const MyProfile = () => {
                     ? <button onClick={updateUserProfileData} className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all'>Save information</button>
                     : <button onClick={() => setIsEdit(true)} className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all'>Edit</button>
                 }
+
+                {/* Conditionally render the Telegram button */}
+                {showTelegramButton && (
+                    <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className='border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all mt-4'>
+                        Send Message to Bot
+                    </a>
+                )}
 
             </div>
         </div>

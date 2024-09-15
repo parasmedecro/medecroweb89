@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 
 const Appointment = () => {
     const { docId } = useParams();
-    const { doctors, currencySymbol, backendUrl, token, getDoctosData } = useContext(AppContext);
+    const { doctors, currencySymbol, backendUrl, token, getDoctosData,userData } = useContext(AppContext);
     const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
     const [docInfo, setDocInfo] = useState(false);
@@ -86,6 +86,13 @@ const Appointment = () => {
             const { data } = await axios.post(backendUrl + '/api/user/book-appointment', { docId, slotDate, slotTime }, { headers: { token } });
             if (data.success) {
                 toast.success(data.message);
+                let docname = docInfo.name
+                let username = userData.name
+                let chatid = userData.chatid
+               
+                let msg = 'scheduled'
+                const temp  = await axios.post(backendUrl+'/api/telegram/sendtelappointmentmsg',{slotTime,slotDate,docname,username,chatid,msg})
+
                 getDoctosData();
                 navigate('/my-appointments');
             } else {

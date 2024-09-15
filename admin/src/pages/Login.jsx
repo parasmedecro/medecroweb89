@@ -44,25 +44,52 @@ const Login = () => {
   }
 
   return (
-    <form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center'>
-      <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-lg'>
-        <p className='text-2xl font-semibold m-auto'><span className='text-primary'>{state}</span> Login</p>
-        <div className='w-full '>
-          <p>Phone Number</p>
-          <input onChange={(e) => setNumber(e.target.value)} value={number} className='border border-[#DADADA] rounded w-full p-2 mt-1' type="tel" pattern='[0-9]{10}' required />
-        </div>
-        <div className='w-full '>
-          <p>Password</p>
-          <input onChange={(e) => setPassword(e.target.value)} value={password} className='border border-[#DADADA] rounded w-full p-2 mt-1' type="password" required />
-        </div>
-        <button className='bg-primary text-white w-full py-2 rounded-md text-base'>Login</button>
-        {
-          state === 'Admin'
-            ? <p>Doctor Login? <span onClick={() => setState('Doctor')} className='text-primary underline cursor-pointer'>Click here</span></p>
-            : <p>Admin Login? <span onClick={() => setState('Admin')} className='text-primary underline cursor-pointer'>Click here</span></p>
-        }
-      </div>
-    </form>
+<form onSubmit={onSubmitHandler} className='min-h-screen flex items-center justify-center p-4'>
+  <div className='flex flex-col gap-5 p-8 min-w-[340px] sm:min-w-[400px] border rounded-xl shadow-lg bg-white'>
+    <h1 className='text-3xl font-bold text-center mb-6'><span className='text-primary'>{state}</span> Login</h1>
+    
+    <div className='w-full'>
+      <label htmlFor="phone" className='block text-gray-700 font-medium mb-1'>Phone Number</label>
+      <input
+        id="phone"
+        type="tel"
+        pattern='[0-9]{10}'
+        required
+        value={number}
+        onChange={(e) => setNumber(e.target.value)}
+        className='border border-gray-300 rounded-lg w-full p-3 text-lg focus:outline-none focus:ring-2 focus:ring-primary'
+      />
+    </div>
+    
+    <div className='w-full'>
+      <label htmlFor="password" className='block text-gray-700 font-medium mb-1'>Password</label>
+      <input
+        id="password"
+        type="password"
+        required
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className='border border-gray-300 rounded-lg w-full p-3 text-lg focus:outline-none focus:ring-2 focus:ring-primary'
+      />
+    </div>
+    
+    <button
+      type="submit"
+      className='bg-primary text-white w-full py-3 rounded-md text-lg font-semibold transition-colors hover:bg-primary-dark'
+    >
+      Login
+    </button>
+    
+    <div className='text-center'>
+      {
+        state === 'Admin'
+          ? <p>Doctor Login? <span onClick={() => setState('Doctor')} className='text-primary underline cursor-pointer'>Click here</span></p>
+          : <p>Admin Login? <span onClick={() => setState('Admin')} className='text-primary underline cursor-pointer'>Click here</span></p>
+      }
+    </div>
+  </div>
+</form>
+
   )
 }
 
