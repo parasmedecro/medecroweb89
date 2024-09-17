@@ -24,6 +24,7 @@ const Appointment = () => {
     };
 
     const getAvailableSlots = async () => {
+        
         setDocSlots([]);
 
         let today = new Date();
@@ -91,10 +92,14 @@ const Appointment = () => {
                 let chatid = userData.chatid
                
                 let msg = 'scheduled'
-                const temp  = await axios.post(backendUrl+'/api/telegram/sendtelappointmentmsg',{slotTime,slotDate,docname,username,chatid,msg})
+                await axios.post(backendUrl+'/api/telegram/sendtelappointmentmsg',{slotTime,slotDate,docname,username,chatid,msg})
 
-                getDoctosData();
+                console.log("Telegram message sent");
+
+        
                 navigate('/my-appointments');
+                console.log("Navigating to my-appointments");
+    
             } else {
                 toast.error(data.message);
             }

@@ -422,7 +422,7 @@ const Prescription = () => {
   
     return `
     *Prescription for ${escapeMarkdownV2(patientName)} \\(Age: ${escapeMarkdownV2(patientAge)}\\)*
-    *Doctor:* ${escapeMarkdownV2(doctorName)} \\(${escapeMarkdownV2(doctorSpecialty)}\\)
+    *Doctor:* ${escapeMarkdownV2(doctorName)} 
     
     *Details:*
     ${prescriptionDetails
@@ -448,14 +448,17 @@ const Prescription = () => {
     }`;
   };
   
-  
+  function replaceDotWithSpace(str) {
+    return str.replace(/\./g, ' ');
+  }
 
   // Function to share via Telegram
   const handleShareTelegram = async (prescription) => {
     let uname = userData1.name
     let uchat = userData1.chatid
     console.log(uname,uchat,prescription)
-    const text = formatPrescriptionText(prescription);
+    const texttemp = formatPrescriptionText(prescription);
+    const text = replaceDotWithSpace(texttemp)
     await axios.post(backendUrl+'/api/telegram/sendtelprescription',{uname,uchat,text})
   };
 

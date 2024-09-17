@@ -19,7 +19,7 @@ const sendAppointMessage = async (req, res) => {
   `;
 
   const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
+  console.log(message)
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -31,14 +31,16 @@ const sendAppointMessage = async (req, res) => {
       parse_mode: 'MarkdownV2'
     }),
   });
-
-  const data = await response.json();
-  if (data.ok) {
-    console.log("Message sent successfully!");
-  } else {
-    console.error("Error sending message:", data);
-  }
-};
+    
+    const data = await response.json();
+    if (data.ok) {
+      console.log("Message sent successfully!");
+      res.status(200).json({ success: true, message: "Message sent successfully!" });  // Send response to frontend
+    } else {
+      console.error("Error sending message:", data);
+      res.status(500).json({ success: false, message: "Error sending message" });  // Send error to frontend
+    }
+  } 
 
 const sendPresMessage = async (req, res) => {
   const {uname,uchat,text} = req.body;
@@ -86,7 +88,7 @@ const sendPresMessage = async (req, res) => {
   // }`;
 
   const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
+  console.log(text)
   const response = await fetch(url, {
     method: "POST",
     headers: {

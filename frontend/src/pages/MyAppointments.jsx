@@ -251,7 +251,7 @@ const MyAppointments = () => {
 
                             }
                             {item.cancelled && !item.isCompleted &&
-                                <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500'>
+                                <button className='sm:min-w-48 py-2 border border-red-500 rounded text-red-500' >
                                     Reschedule Appointment
                                 </button>
                             }
@@ -310,7 +310,9 @@ const MyAppointments = () => {
 
                                     <div className="flex justify-center">
                                         <button
-                                            onClick={() => ReAppointment(userid,item.docData.name)}
+                                            onClick={() =>{ ReAppointment(userid,item.docData.name)
+                                                setShowRescheduleModal(false)
+                                            }}
                                             className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-md"
                                         >
                                             Confirm Reschedule
@@ -335,3 +337,4 @@ const MyAppointments = () => {
 }
 
 export default MyAppointments
+
