@@ -9,6 +9,56 @@ import PatientProfile from './PatientProfile';
 
 const Prescription = () => {
   const { id } = useParams();
+  const diseaseMedicines = {
+    "fever": { type: "Tablet", medicine: "Paracetamol" },
+    "headache": { type: "Tablet", medicine: "Ibuprofen" },
+    "runny nose": { type: "Drop", medicine: "Nasal Drop" },
+    "cough": { type: "Syrup", medicine: "Cough Syrup" },
+    "cold": { type: "Tablet", medicine: "Antihistamine" },
+    "sore throat": { type: "Lozenge", medicine: "Throat Lozenges" },
+    "muscle pain": { type: "Tablet", medicine: "Aspirin" },
+    "joint pain": { type: "Cream", medicine: "Anti-inflammatory Cream" },
+    "stomach ache": { type: "Tablet", medicine: "Antacid" },
+    "indigestion": { type: "Tablet", medicine: "Digestive Aid" },
+    "allergy": { type: "Tablet", medicine: "Antihistamine" },
+    "skin rash": { type: "Cream", medicine: "Hydrocortisone Cream" },
+    "acne": { type: "Cream", medicine: "Benzoyl Peroxide" },
+    "dizziness": { type: "Tablet", medicine: "Anti-vertigo Tablet" },
+    "nausea": { type: "Tablet", medicine: "Anti-nausea Tablet" },
+    "vomiting": { type: "Tablet", medicine: "Anti-vomiting Tablet" },
+    "constipation": { type: "Laxative", medicine: "Fiber Supplement" },
+    "diarrhea": { type: "Tablet", medicine: "Anti-diarrheal Tablet" },
+    "high blood pressure": { type: "Tablet", medicine: "ACE Inhibitor" },
+    "diabetes": { type: "Tablet", medicine: "Metformin" },
+    "insomnia": { type: "Tablet", medicine: "Sleep Aid" },
+    "anxiety": { type: "Tablet", medicine: "Anti-anxiety Medication" },
+    "depression": { type: "Tablet", medicine: "Antidepressant" },
+    "asthma": { type: "Inhaler", medicine: "Bronchodilator" },
+    "bronchitis": { type: "Syrup", medicine: "Expectorant Syrup" },
+    "sinusitis": { type: "Drop", medicine: "Nasal Spray" },
+    "ear infection": { type: "Drop", medicine: "Ear Drops" },
+    "toothache": { type: "Gel", medicine: "Dental Gel" },
+    "back pain": { type: "Cream", medicine: "Pain Relief Cream" },
+    "ulcer": { type: "Tablet", medicine: "Antacid" },
+    "heartburn": { type: "Tablet", medicine: "Proton Pump Inhibitor" },
+    "chronic cough": { type: "Syrup", medicine: "Cough Suppressant Syrup" },
+    "gout": { type: "Tablet", medicine: "Uric Acid Reducer" },
+    "kidney stones": { type: "Tablet", medicine: "Pain Reliever" },
+    "osteoporosis": { type: "Tablet", medicine: "Calcium Supplement" },
+    "pneumonia": { type: "Antibiotic", medicine: "Pneumonia Antibiotic" },
+    "herpes": { type: "Cream", medicine: "Antiviral Cream" },
+    "psoriasis": { type: "Cream", medicine: "Topical Steroid" },
+    "eczema": { type: "Cream", medicine: "Moisturizing Cream" },
+    "menstrual cramps": { type: "Tablet", medicine: "Pain Reliever" },
+    "UTI": { type: "Tablet", medicine: "Antibiotic" },
+    "hypertension": { type: "Tablet", medicine: "Beta Blocker" },
+    "hyperthyroidism": { type: "Tablet", medicine: "Antithyroid Drug" },
+    "hypothyroidism": { type: "Tablet", medicine: "Thyroid Hormone Replacement" },
+    "stroke": { type: "Tablet", medicine: "Antiplatelet" },
+    "heart attack": { type: "Tablet", medicine: "Antiplatelet" },
+    "allergic rhinitis": { type: "Tablet", medicine: "Antihistamine" },
+    "chronic fatigue": { type: "Tablet", medicine: "Vitamin Supplement" }
+  };
   const [patient, setPatient] = useState(null);
   const [userData, setPatientData] = useState({ name: '', dob: '', phone: '', address: '', gender: '' });
   const [userData1, setPatientData1] = useState(null);
@@ -21,6 +71,9 @@ const Prescription = () => {
   const [investigations, setInvestigations] = useState([]);
   const [symtom1, setsymtom1] = useState('')
   const [medtype1, setmedtype1] = useState('')
+  const [symptomsuggest, setsymptomsuggest] = useState(false)
+  const [symptom1, setSymptom1] = useState('');
+  const [filteredSymptoms, setFilteredSymptoms] = useState(Object.keys(diseaseMedicines));
   const [medname1, setmename1] = useState('')
   const [activeForm, setActiveForm] = useState(null);
   const [newPrescription, setNewPrescription] = useState({
@@ -34,6 +87,31 @@ const Prescription = () => {
     advice: '',
     instruction: '',
   });
+
+  const [medname2, setMedname2] = useState('');
+  const [filteredMedicines, setFilteredMedicines] = useState(
+    diseaseMedicines[symtom1]?.medicine ? [diseaseMedicines[symtom1].medicine] : []
+  );
+
+  const handleInputChangeMedicine = (value) => {
+    setMedname2(value);
+    setmename1(value);
+    // Filter medicines based on input
+    const filtered = [
+      ...(diseaseMedicines[symtom1]?.medicine ? [diseaseMedicines[symtom1].medicine] : []),
+      ...(medicines[newPrescription.type]?.filter((med) =>
+        med.toLowerCase().includes(value.toLowerCase())
+      ) || []),
+    ];
+
+    setFilteredMedicines(filtered);
+  };
+
+  const handleSelectMedicine = (medicine) => {
+    setMedname2(medicine);
+    setFilteredMedicines([]); // Hide dropdown after selection
+  };
+
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -50,6 +128,15 @@ const Prescription = () => {
     };
     fetchPatientData();
   }, [id]);
+
+
+
+  const handleSelect = (symptom) => {
+    setSymptom1(symptom);
+    // setsymtom1(symptom);
+    handleInputChangesym(symptom)
+    setFilteredSymptoms([]); // Hide the dropdown after selection
+  };
 
   const medicines = {
     Tablet: [
@@ -114,57 +201,26 @@ const Prescription = () => {
     ]
   };
 
-  const diseaseMedicines = {
-    "fever": { type: "Tablet", medicine: "Paracetamol" },
-    "headache": { type: "Tablet", medicine: "Ibuprofen" },
-    "runny nose": { type: "Drop", medicine: "Nasal Drop" },
-    "cough": { type: "Syrup", medicine: "Cough Syrup" },
-    "cold": { type: "Tablet", medicine: "Antihistamine" },
-    "sore throat": { type: "Lozenge", medicine: "Throat Lozenges" },
-    "muscle pain": { type: "Tablet", medicine: "Aspirin" },
-    "joint pain": { type: "Cream", medicine: "Anti-inflammatory Cream" },
-    "stomach ache": { type: "Tablet", medicine: "Antacid" },
-    "indigestion": { type: "Tablet", medicine: "Digestive Aid" },
-    "allergy": { type: "Tablet", medicine: "Antihistamine" },
-    "skin rash": { type: "Cream", medicine: "Hydrocortisone Cream" },
-    "acne": { type: "Cream", medicine: "Benzoyl Peroxide" },
-    "dizziness": { type: "Tablet", medicine: "Anti-vertigo Tablet" },
-    "nausea": { type: "Tablet", medicine: "Anti-nausea Tablet" },
-    "vomiting": { type: "Tablet", medicine: "Anti-vomiting Tablet" },
-    "constipation": { type: "Laxative", medicine: "Fiber Supplement" },
-    "diarrhea": { type: "Tablet", medicine: "Anti-diarrheal Tablet" },
-    "high blood pressure": { type: "Tablet", medicine: "ACE Inhibitor" },
-    "diabetes": { type: "Tablet", medicine: "Metformin" },
-    "insomnia": { type: "Tablet", medicine: "Sleep Aid" },
-    "anxiety": { type: "Tablet", medicine: "Anti-anxiety Medication" },
-    "depression": { type: "Tablet", medicine: "Antidepressant" },
-    "asthma": { type: "Inhaler", medicine: "Bronchodilator" },
-    "bronchitis": { type: "Syrup", medicine: "Expectorant Syrup" },
-    "sinusitis": { type: "Drop", medicine: "Nasal Spray" },
-    "ear infection": { type: "Drop", medicine: "Ear Drops" },
-    "toothache": { type: "Gel", medicine: "Dental Gel" },
-    "back pain": { type: "Cream", medicine: "Pain Relief Cream" },
-    "ulcer": { type: "Tablet", medicine: "Antacid" },
-    "heartburn": { type: "Tablet", medicine: "Proton Pump Inhibitor" },
-    "chronic cough": { type: "Syrup", medicine: "Cough Suppressant Syrup" },
-    "gout": { type: "Tablet", medicine: "Uric Acid Reducer" },
-    "kidney stones": { type: "Tablet", medicine: "Pain Reliever" },
-    "osteoporosis": { type: "Tablet", medicine: "Calcium Supplement" },
-    "pneumonia": { type: "Antibiotic", medicine: "Pneumonia Antibiotic" },
-    "herpes": { type: "Cream", medicine: "Antiviral Cream" },
-    "psoriasis": { type: "Cream", medicine: "Topical Steroid" },
-    "eczema": { type: "Cream", medicine: "Moisturizing Cream" },
-    "menstrual cramps": { type: "Tablet", medicine: "Pain Reliever" },
-    "UTI": { type: "Tablet", medicine: "Antibiotic" },
-    "hypertension": { type: "Tablet", medicine: "Beta Blocker" },
-    "hyperthyroidism": { type: "Tablet", medicine: "Antithyroid Drug" },
-    "hypothyroidism": { type: "Tablet", medicine: "Thyroid Hormone Replacement" },
-    "stroke": { type: "Tablet", medicine: "Antiplatelet" },
-    "heart attack": { type: "Tablet", medicine: "Antiplatelet" },
-    "allergic rhinitis": { type: "Tablet", medicine: "Antihistamine" },
-    "chronic fatigue": { type: "Tablet", medicine: "Vitamin Supplement" }
-  };
 
+  function timeconverter(dateString) {
+    // Convert the input string to a Date object
+    const date = new Date(dateString);
+
+    // Define options for formatting the date
+    const options = {
+      timeZone: "Asia/Kolkata",
+      hour12: true,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
+
+    // Return the formatted date and time in IST
+    return date.toLocaleString("en-IN", options);
+  }
 
 
   useEffect(() => {
@@ -251,6 +307,7 @@ const Prescription = () => {
     console.log(type1, medicine1, value)
     setmedtype1(type1);
     setmename1(medicine1);
+    setMedname2(medicine1);
     setNewPrescription({ ...newPrescription, symptoms: value, type: type1, medicine: medicine1 })
   };
   const handleInputChangetype = (value) => {
@@ -337,6 +394,17 @@ const Prescription = () => {
     }
   };
 
+  const handleInputChange1 = (value) => {
+    setSymptom1(value);
+
+    // Filter the symptoms based on the input value
+    const filtered = Object.keys(diseaseMedicines).filter((symptom) =>
+      symptom.toLowerCase().startsWith(value.toLowerCase())
+    );
+
+    setFilteredSymptoms(filtered);
+  };
+
   const saveAllData = async () => {
     try {
       await axios.post(
@@ -373,29 +441,157 @@ const Prescription = () => {
   // Function to download the content as a PDF
   const handleDownloadPDF = (prescription) => {
     const doc = new jsPDF();
+    const marginLeft = 20;
+    let currentY = 20;
 
-    // Adding content to the PDF (prescription example)
-    doc.text(`Prescription for ${prescription.patientName}`, 10, 10);
-    doc.text(`Age: ${prescription.patientAge}`, 10, 20);
-    doc.text(
-      `Doctor: ${prescription.doctorName} (${prescription.doctorSpecialty})`,
-      10,
-      30
-    );
+    // Title
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text("Prescription", marginLeft, currentY);
+    currentY += 10;
 
-    doc.text("Details:", 10, 40);
+    // Divider line
+    doc.setLineWidth(0.5);
+    doc.line(marginLeft, currentY, 190, currentY);
+    currentY += 10;
+
+    // Patient Info Section
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Patient Name: `, marginLeft, currentY);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${prescription.patientName}`, marginLeft + 40, currentY);
+    currentY += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Age: `, marginLeft, currentY);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${prescription.patientAge}`, marginLeft + 40, currentY);
+    currentY += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Time: `, marginLeft, currentY);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${timeconverter(prescription.createdAt)}`, marginLeft + 40, currentY);
+    currentY += 10;
+
+    // Divider line
+    doc.line(marginLeft, currentY, 190, currentY);
+    currentY += 10;
+
+    // Doctor Info Section
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Doctor: `, marginLeft, currentY);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${prescription.doctorName}`, marginLeft + 40, currentY);
+    currentY += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Specialty: `, marginLeft, currentY);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${prescription.doctorSpecialty}`, marginLeft + 40, currentY);
+    currentY += 10;
+
+    // Divider line
+    doc.line(marginLeft, currentY, 190, currentY);
+    currentY += 10;
+
+    // Prescription Details Section Header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text("Prescription Details", marginLeft, currentY);
+    currentY += 8;
+
+    // Prescription Details
     prescription.prescriptionDetails.forEach((detail, index) => {
-      const yOffset = 30; // Ensure enough space between entries
-      const startY = 60 + index * yOffset; // Calculate Y dynamically based on index and offset
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      currentY += 10;
 
-      doc.text(`Medicine ${index + 1}: ${detail.medicine}`, 10, startY);
-      doc.text(`- Dose: ${detail.dose}`, 10, startY + 10); // Move down by 10 units
-      doc.text(`- Days: ${detail.days}`, 10, startY + 20); // Move down by another 10 units
+      doc.text(`Medicine ${index + 1}:`, marginLeft, currentY);
+      doc.setFont('helvetica', 'bold');
+      doc.text(detail.medicine, marginLeft + 40, currentY);
+
+      currentY += 8;
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Type: `, marginLeft, currentY);
+      doc.setFont('helvetica', 'bold');
+      doc.text(detail.type, marginLeft + 40, currentY);
+
+      currentY += 8;
+      let slotText = '';
+      if (detail.slot?.morning) slotText += ' Morning';
+      if (detail.slot?.afternoon) slotText += ' Afternoon';
+      if (detail.slot?.night) slotText += ' Night';
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Slot: `, marginLeft, currentY);
+      doc.setFont('helvetica', 'bold');
+      doc.text(slotText.trim() || 'N/A', marginLeft + 40, currentY);
+
+      currentY += 8;
+      let beforeAfterText = '';
+      if (detail.beforeAfter?.before) beforeAfterText += ' Before';
+      if (detail.beforeAfter?.after) beforeAfterText += ' After';
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Before/After: `, marginLeft, currentY);
+      doc.setFont('helvetica', 'bold');
+      doc.text(beforeAfterText.trim() || 'N/A', marginLeft + 40, currentY);
+
+      currentY += 8;
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Dose: `, marginLeft, currentY);
+      doc.setFont('helvetica', 'bold');
+      doc.text(detail.dose, marginLeft + 40, currentY);
+
+      currentY += 8;
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Days: `, marginLeft, currentY);
+      doc.setFont('helvetica', 'bold');
+      doc.text(detail.days, marginLeft + 40, currentY);
     });
 
-    // Saving the PDF
+    currentY += 10;
+    // Divider line
+    doc.line(marginLeft, currentY, 190, currentY);
+    currentY += 10;
+
+    // Advice Section
+    if (prescription.advice.length > 0) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text("Advice", marginLeft, currentY);
+      currentY += 8;
+
+      doc.setFont('helvetica', 'normal');
+      prescription.advice.forEach((item, index) => {
+        doc.text(`${index + 1}. ${item}`, marginLeft, currentY);
+        currentY += 8;
+      });
+    }
+
+    currentY += 10;
+    // Divider line
+    doc.line(marginLeft, currentY, 190, currentY);
+    currentY += 10;
+
+    // Investigations Section
+    if (prescription.investigations.length > 0) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text("Investigations", marginLeft, currentY);
+      currentY += 8;
+
+      doc.setFont('helvetica', 'normal');
+      prescription.investigations.forEach((item, index) => {
+        doc.text(`${index + 1}. ${item}`, marginLeft, currentY);
+        currentY += 8;
+      });
+    }
+
+    // Save the PDF
     doc.save(`${prescription.patientName}_prescription.pdf`);
   };
+
 
   // Function to format the prescription details for sharing
   const escapeMarkdownV2 = (text) => {
@@ -405,11 +601,11 @@ const Prescription = () => {
       .replace(/\\/g, '\\\\') // Escape backslashes
       .replace(/\n/g, '\\n'); // Handle newlines
   };
-  
-  
+
+
   const formatPrescriptionText = (prescription) => {
     if (!prescription) return "No prescription data available";
-  
+
     const {
       patientName = "Unknown Patient",
       patientAge = "Unknown Age",
@@ -419,35 +615,35 @@ const Prescription = () => {
       advice = [],
       investigations = []
     } = prescription;
-  
+
     return `
     *Prescription for ${escapeMarkdownV2(patientName)} \\(Age: ${escapeMarkdownV2(patientAge)}\\)*
     *Doctor:* ${escapeMarkdownV2(doctorName)} 
     
     *Details:*
     ${prescriptionDetails
-      .map(
-        (detail) => `
+        .map(
+          (detail) => `
       \\- *Medicine:* ${escapeMarkdownV2(detail.medicine || "Unknown")}
       \\- *Dose:* ${escapeMarkdownV2(detail.dose || "Unknown")}
       \\- *Days:* ${escapeMarkdownV2(detail.days || "Unknown")}
       \\- *Slot:* ${detail.slot?.morning ? "Morning " : ""}${detail.slot?.afternoon ? "Afternoon " : ""}${detail.slot?.night ? "Night" : ""}
       \\- *Before/After:* ${detail.beforeAfter?.before ? "Before " : ""}${detail.beforeAfter?.after ? "After" : ""}
       `
-      )
-      .join("")}
+        )
+        .join("")}
     
     *Advice:* ${advice.length > 0
-      ? escapeMarkdownV2(advice.join(", "))
-      : "No advice"
-    }
+        ? escapeMarkdownV2(advice.join(", "))
+        : "No advice"
+      }
     
     *Investigations:* ${investigations.length > 0
-      ? escapeMarkdownV2(investigations.join(", "))
-      : "No investigations"
-    }`;
+        ? escapeMarkdownV2(investigations.join(", "))
+        : "No investigations"
+      }`;
   };
-  
+
   function replaceDotWithSpace(str) {
     return str.replace(/\./g, ' ');
   }
@@ -456,10 +652,10 @@ const Prescription = () => {
   const handleShareTelegram = async (prescription) => {
     let uname = userData1.name
     let uchat = userData1.chatid
-    console.log(uname,uchat,prescription)
+    console.log(uname, uchat, prescription)
     const texttemp = formatPrescriptionText(prescription);
     const text = replaceDotWithSpace(texttemp)
-    await axios.post(backendUrl+'/api/telegram/sendtelprescription',{uname,uchat,text})
+    await axios.post(backendUrl + '/api/telegram/sendtelprescription', { uname, uchat, text })
   };
 
 
@@ -578,21 +774,38 @@ const Prescription = () => {
               <div className="bg-white p-6 shadow rounded w-full mt-4">
                 <h3 className="text-lg font-semibold mb-4">Add Medicine</h3>
                 <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
-                  <div>
+
+
+                  <div className="relative">
                     <label className="text-gray-700 font-medium">Symptoms:</label>
-                    <select
+                    <input
+                      type="text"
                       className="border border-gray-300 rounded p-2 w-full"
-                      value={symtom1}
-                      onChange={(e) => handleInputChangesym(e.target.value)}
-                    >
-                      <option value="">Select Type</option>
-                      {Object.keys(diseaseMedicines).map((symptoms, index) => (
-                        <option key={index} value={symptoms}>
-                          {symptoms}
-                        </option>
-                      ))}
-                    </select>
+                      value={symptom1}
+                      onChange={(e) => handleInputChange1(e.target.value)}
+                      onFocus={() => setsymptomsuggest(true)}
+                      placeholder="Type to search"
+                    />
+
+                    {/* Render dropdown list based on the filtered results */}
+                    {filteredSymptoms.length > 0 && symptom1.length > 0 && symptomsuggest && (
+                      <ul className="absolute z-10 w-full bg-white border-y-teal-950 border-2 rounded mt-1 max-h-60 overflow-y-auto">
+                        {filteredSymptoms.map((symptom, index) => (
+                          <li
+                            key={index}
+                            onClick={() => handleSelect(symptom)}
+                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                          >
+                            {symptom}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
+
+
+
+
                   <div>
                     <label className="text-gray-700 font-medium">Medicine Type:</label>
                     <select
@@ -605,8 +818,13 @@ const Prescription = () => {
                       <option value="">Select Type</option>
                       {diseaseMedicines[symtom1] && (
                         <option value={diseaseMedicines[symtom1].type}>
-                          {diseaseMedicines[symtom1].type}
+                          {`${diseaseMedicines[symtom1].type}`}
+                          <span>
+                            {`-- suggested`}
+                          </span>
                         </option>
+
+
 
                       )}
                       {/* <option value="">Select Type</option> */}
@@ -618,7 +836,7 @@ const Prescription = () => {
                     </select>
 
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="text-gray-700 font-medium">Medicine Name:</label>
                     <select
                       className="border border-gray-300 rounded p-2 w-full"
@@ -633,13 +851,39 @@ const Prescription = () => {
                           {diseaseMedicines[symtom1].medicine}
                         </option>
                       )}
-                      {/* <option value="">Select Medicine</option> */}
                       {medicines[newPrescription.type]?.map((med, index) => (
                         <option key={index} value={med}>
                           {med}
                         </option>
                       ))}
                     </select>
+                  </div> */}
+                  <div>
+                    <label className="text-gray-700 font-medium">Medicine Name:</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        className="border border-gray-300 rounded p-2 w-full"
+                        value={medname2}
+                        onChange={(e) => handleInputChangeMedicine(e.target.value)}
+                        placeholder="Type to search for medicine"
+                      />
+
+                      {/* Render filtered options */}
+                      {filteredMedicines.length > 0 && (
+                        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded mt-1 max-h-60 overflow-y-auto">
+                          {filteredMedicines.map((medicine, index) => (
+                            <li
+                              key={index}
+                              onClick={() => handleSelectMedicine(medicine)}
+                              className="p-2 hover:bg-gray-100 cursor-pointer"
+                            >
+                              {medicine}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
 
 
@@ -900,8 +1144,10 @@ const Prescription = () => {
                 <h2 className="text-xl font-semibold mb-2">
                   Patient Name: {prescription.patientName}
                 </h2>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-gray-700 w-full flex justify-between">
                   Age: {prescription.patientAge}
+                  <span> </span>
+                  Time: {timeconverter(prescription.createdAt)}
                 </p>
                 <p className="text-sm text-gray-700">
                   Doctor: {prescription.doctorName} (
