@@ -22,7 +22,7 @@ connectCloudinary();
 app.use(express.json());
 
 app.use(cors({
-  origin: 'https://quickmedpatient.vercel.app',
+  origin: ['https://quickmedpatient.vercel.app', 'https://quickmeddoctor.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
