@@ -11,13 +11,21 @@ import chatIdMap from './bot.js'; // Import the Telegram bot logic
 
 // app config
 const app = express();
+
+
+
 const port = process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
 
 // middlewares
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+  origin: 'https://quickmedpatient.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 // api endpoints
 app.use("/api/user", userRouter);
