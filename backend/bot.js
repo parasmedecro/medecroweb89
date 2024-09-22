@@ -7,7 +7,7 @@ const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 connectDB();
 
-const chatIdMap = {}
+const chatIdMap = {};
 
 // Function to send a medicine reminder
 const sendMedicineReminder = async (chatId, medicineName) => {
@@ -25,7 +25,6 @@ const sendMedicineReminder = async (chatId, medicineName) => {
     };
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
-
     const outdatedReminders = await MedicineModel.find({
       chatId,
       medicineName,
@@ -39,17 +38,19 @@ const sendMedicineReminder = async (chatId, medicineName) => {
         { _id: { $in: outdatedReminders.map((reminder) => reminder._id) } },
         {
           $set: {
-            response: 'no response',
+            response: "no response",
             responseAt: null,
           },
         }
       );
-      console.log(`Updated ${outdatedReminders.length} outdated reminders to 'no response' for "${medicineName}".`);
+      console.log(
+        `Updated ${outdatedReminders.length} outdated reminders to 'no response' for "${medicineName}".`
+      );
     }
     const outdatedReminders1 = await MedicineModel.find({
       chatId,
       medicineName,
-      response: 'no',
+      response: "no",
       remindedAt: { $lt: oneHourAgo }, // remindedAt is before one hour ago
     });
 
@@ -59,30 +60,37 @@ const sendMedicineReminder = async (chatId, medicineName) => {
         { _id: { $in: outdatedReminders.map((reminder) => reminder._id) } },
         {
           $set: {
-            response: 'not taken'
+            response: "not taken",
           },
         }
       );
-      console.log(`Updated ${outdatedReminders.length} outdated reminders to 'no response' for "${medicineName}".`);
+      console.log(
+        `Updated ${outdatedReminders.length} outdated reminders to 'no response' for "${medicineName}".`
+      );
     }
-
 
     const liveReminders = await MedicineModel.find({
       chatId,
       medicineName,
-      response: 'no',
-      remindedAt: { $gt: oneHourAgo }, // remindedAt is before one hour ago
+      response: "no",
+      remindedAt: { $gt: oneHourAgo }, // remindedAt is between one hour
     });
 
     const reminder = await MedicineModel.findOneAndUpdate(
-      { chatId, medicineName, response: null }, // Find an existing reminder with no response
+      { chatId, medicineName, response: { $in: [null, "no"] } }, // Find an existing reminder with no response
       { $set: { remindedAt: new Date() } }, // Update the time when the reminder is sent
       { new: true, upsert: true } // Create a new entry if none is found
     );
 
-    await bot.sendMessage(chatId, `Did you take your ${medicineName}?`, options);
+    await bot.sendMessage(
+      chatId,
+      `Did you take your ${medicineName}?`,
+      options
+    );
 
-    console.log(`Sent medicine reminder for "${medicineName}" to Chat ID: ${chatId}`);
+    console.log(
+      `Sent medicine reminder for "${medicineName}" to Chat ID: ${chatId}`
+    );
   } catch (error) {
     console.error("Error sending medicine reminder:", error);
     bot.sendMessage(chatId, "An error occurred while processing your request.");
@@ -135,7 +143,7 @@ bot.on("message", async (msg) => {
 
   try {
     // Example call to send a reminder (use this as needed in your logic)
-    sendMedicineReminder(chatId, "DARU");
+    sendMedicineReminder(chatId, "Vitamin D");
   } catch (error) {
     console.error("Error handling message:", error);
     bot.sendMessage(chatId, "An error occurred while processing your request.");
@@ -147,21 +155,27 @@ bot.on("callback_query", async (callbackQuery) => {
   const { data, message } = callbackQuery;
   const chatId = message.chat.id;
   const username = message.chat.username || "Unknown user";
-  const [response, medicineName] = data.split('_'); // Split callback_data to get 'yes'/'no' and medicine name
+  const [response, medicineName] = data.split("_"); // Split callback_data to get 'yes'/'no' and medicine name
 
   // Log the user's response to the console
-  console.log(`User: ${username} (Chat ID: ${chatId}) responded: ${response} for ${medicineName}`);
+  console.log(
+    `User: ${username} (Chat ID: ${chatId}) responded: ${response} for ${medicineName}`
+  );
 
   try {
     const timestamp = new Date();
-    const reminder = await MedicineModel.findOne({ chatId, medicineName, response: null });
+    const reminder = await MedicineModel.findOne({
+      chatId,
+      medicineName,
+      response: null,
+    });
 
     if (reminder) {
       // Update existing reminder record with response and timestamp
-      await MedicineModel.findByIdAndUpdate(
-        reminder._id,
-        { response: response, timestamp: timestamp }
-      );
+      await MedicineModel.findByIdAndUpdate(reminder._id, {
+        response: response,
+        timestamp: timestamp,
+      });
     } else {
       console.error("Reminder not found.");
       return;
@@ -174,8 +188,11 @@ bot.on("callback_query", async (callbackQuery) => {
     if (response === "yes") {
       bot.sendMessage(chatId, `Great! Glad you took your ${medicineName}.`);
     } else if (response === "no") {
-      bot.sendMessage(chatId, `Don't forget to take your ${medicineName}! I’ll remind you again in 15 minutes.`);
-      
+      bot.sendMessage(
+        chatId,
+        `Don't forget to take your ${medicineName}! I’ll remind you again in 15 minutes.`
+      );
+
       // Remind the user again after 15 minutes
       setTimeout(() => {
         sendMedicineReminder(chatId, medicineName);
@@ -186,7 +203,10 @@ bot.on("callback_query", async (callbackQuery) => {
     bot.answerCallbackQuery(callbackQuery.id);
   } catch (error) {
     console.error("Error handling callback query:", error);
-    bot.sendMessage(chatId, "An error occurred while processing your response.");
+    bot.sendMessage(
+      chatId,
+      "An error occurred while processing your response."
+    );
   }
 });
 
