@@ -44,7 +44,7 @@ const Header = () => {
                     Book Appointment <br /> With Trusted Doctors
                 </p>
                 <a
-                    href='/doctor'
+                    href='/doctors'
                     className='flex items-center gap-2 bg-green-500 px-16 py-4 font-semibold text-lg rounded-full text-white m-auto md:m-0 hover:scale-105 transition-all duration-300'
                 >
                     Book appointment <img className='w-3' src={assets.arrow_icon} alt="" />
