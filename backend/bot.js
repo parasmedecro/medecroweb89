@@ -7,8 +7,23 @@ const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 connectDB();
 
-const chatIdMap = {};
+const createMedicineReminder = async (chatId, medicineName) => {
+  try {
+    const newReminder = await MedicineModel.create({
+      chatId,
+      medicineName,
+      response: null,  // Set to null initially
+      timestamp: Date.now() // Optionally, set the remindedAt field to the current time
+    });
 
+    console.log('New reminder created:', newReminder);
+  } catch (error) {
+    console.error('Error creating reminder:', error);
+  }
+};
+
+
+const chatIdMap = {};
 // Function to send a medicine reminder
 const sendMedicineReminder = async (chatId, medicineName) => {
   try {
@@ -142,6 +157,7 @@ bot.on("message", async (msg) => {
   }
 
   try {
+    createMedicineReminder(chatId,"Vitamin D")
     // Example call to send a reminder (use this as needed in your logic)
     sendMedicineReminder(chatId, "Vitamin D");
   } catch (error) {

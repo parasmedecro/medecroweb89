@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema({
     gender: { type: String, default: 'Not Selected' },
     dob: { type: String, default: 'Not Selected' },
     password: { type: String, required: true },
+    custom_data: {
+      type: Map,
+      of: mongoose.Schema.Types.Mixed,  // Allows dynamic key-value pairs
+    }
 })
 
 const userModel = mongoose.models.user || mongoose.model("user", userSchema);

@@ -29,12 +29,13 @@ function Report() {
         setIsLoading(true);
         setAnalyzed(false);
         try {
-            const response = await axios.post(`${backendUrl}/api/doctor/report`, formData, {
+            const response = await axios.post(`${backendUrl}/api/doctor/report/${id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     dToken
                 },
             });
+            console.log(response)
             setResults(response.data);
             setAnalyzed(true);
         } catch (error) {
@@ -76,7 +77,6 @@ function Report() {
                             />
                             <button
                                 className="ml-2 px-4 py-1 bg-blue-500 text-white rounded-lg shadow-md"
-                                onClick={() => saveToDb({ key, field, value: fieldValue })}
                             >
                                 Save to DB
                             </button>
@@ -130,8 +130,20 @@ function Report() {
         return null;
     };
 
-    const saveToDb = (data) => {
-        toast.success("Added to patient Database.")
+    const saveToDb = async (key,value) => {
+        try {
+            const response = await axios.post(`${backendUrl}/api/doctor/addtodb/${id}`, {key:key,value:value}, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    dToken
+                  }
+            });
+            console.log(response)
+            toast.success("Data added sucessfully.")
+        } catch (error) {
+            console.error(error);
+            toast.error("Something went wrong.")
+        }
     };
 
     return (
